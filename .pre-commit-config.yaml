@@ -1,0 +1,129 @@
+# Pre-commit configuration for Indico Push Notifications Plugin
+# See https://pre-commit.com for more information
+
+repos:
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^tests/.*\.(json|yaml)$
+      - id: end-of-file-fixer
+        exclude: ^tests/.*\.(json|yaml)$
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-toml
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+      - id: detect-private-key
+
+  # Python code formatting
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        language_version: python3
+        args: ['--line-length=88', '--target-version=py37']
+
+  # Python import sorting
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ['--profile=black', '--line-length=88']
+
+  # Python linting
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-bugbear==23.11.28
+          - flake8-comprehensions==3.14.0
+          - flake8-docstrings==1.7.0
+          - flake8-import-order==0.18.2
+          - flake8-quotes==3.3.2
+          - flake8-string-format==0.3.0
+          - flake8-type-checking==2.6.0
+        args: ['--max-line-length=88', '--extend-ignore=E203,W503']
+
+  # Python type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-requests
+          - types-python-dateutil
+          - types-pyyaml
+          - sqlalchemy-stubs
+        args: ['--ignore-missing-imports', '--no-implicit-optional', '--strict-equality']
+
+  # Security checks
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.7
+    hooks:
+      - id: bandit
+        args: ['-c', 'pyproject.toml']
+        exclude: ^tests/
+
+  # Shell script linting
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        exclude: ^(alembic/|tests/|\.venv/)
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli2
+    rev: v0.10.0
+    hooks:
+      - id: markdownlint-cli2
+        args: ['--config', '.markdownlint.json']
+        exclude: ^(docs/|CHANGELOG.md|LICENSE)
+
+  # YAML linting
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.33.0
+    hooks:
+      - id: yamllint
+        args: ['-c', '.yamllint.yaml']
+        exclude: ^(alembic/|tests/|\.venv/)
+
+  # JSON linting
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.27.3
+    hooks:
+      - id: check-jsonschema
+        name: "Check GitHub Workflows"
+        files: '\.github/workflows/.*\.ya?ml$'
+        types: [file]
+        args: ['--schemafile', 'https://json.schemastore.org/github-workflow']
+
+  # Commit message linting
+  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
+    rev: v9.6.0
+    hooks:
+      - id: commitlint
+        stages: [commit-msg]
+        additional_dependencies: ['@commitlint/config-conventional']
+
+# Default configuration
+default_language_version:
+  python: python3
+
+# Default stages to run hooks on
+default_stages: [commit, push]
+
+# Skip hooks on specific files
+exclude: '^(.venv/|build/|dist/|\.git/|__pycache__/|\.pytest_cache/|\.mypy_cache/)'
+
+# Fail fast on first error
+fail_fast: false
+
+# Minimum pre-commit version
+minimum_pre_commit_version: '3.0.0'

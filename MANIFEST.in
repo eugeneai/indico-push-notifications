@@ -1,0 +1,60 @@
+# MANIFEST.in for Indico Push Notifications Plugin
+# This file specifies additional files to include in the package distribution
+
+# Include README
+include README.md
+include LICENSE
+
+# Include requirements file
+include requirements.txt
+
+# Include setup files
+include setup.py
+
+# Include Alembic migration files
+recursive-include alembic *.py
+recursive-include alembic *.ini
+recursive-include alembic *.mako
+
+# Include template files
+recursive-include templates *.html
+recursive-include templates *.js
+
+# Include static files
+recursive-include static *.js
+recursive-include static *.css
+recursive-include static *.png
+recursive-include static *.ico
+
+# Include test files
+recursive-include tests *.py
+
+# Include documentation files
+recursive-include docs *.md
+recursive-include docs *.rst
+
+# Exclude development files
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.pyd
+global-exclude __pycache__
+global-exclude *.so
+global-exclude *.dll
+global-exclude *.dylib
+
+# Exclude version control files
+global-exclude .git
+global-exclude .gitignore
+global-exclude .svn
+global-exclude .hg
+
+# Exclude IDE files
+global-exclude .idea
+global-exclude .vscode
+global-exclude *.swp
+global-exclude *.swo
+
+# Exclude build artifacts
+global-exclude build
+global-exclude dist
+global-exclude *.egg-info

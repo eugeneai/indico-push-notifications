@@ -1,0 +1,117 @@
+# YAML lint configuration for Indico Push Notifications Plugin
+# See https://yamllint.readthedocs.io/en/stable/ for documentation
+
+extends: default
+
+rules:
+  # Document
+  document-start:
+    level: warning
+    present: false
+  document-end:
+    level: warning
+    present: false
+
+  # Indentation
+  indentation:
+    indent-sequences: consistent
+    check-multi-line-strings: false
+    spaces: 2
+
+  # Line length
+  line-length:
+    level: warning
+    max: 120
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
+
+  # Trailing spaces
+  trailing-spaces:
+    level: error
+
+  # Empty lines
+  empty-lines:
+    level: warning
+    max: 2
+    max-start: 0
+    max-end: 1
+
+  # Comments
+  comments:
+    level: warning
+    require-starting-space: true
+    min-spaces-from-content: 1
+
+  # Key duplication
+  key-duplicates:
+    level: error
+
+  # Truthy values
+  truthy:
+    level: warning
+    allowed-values: ['true', 'false', 'yes', 'no', 'on', 'off']
+
+  # Quoted strings
+  quoted-strings:
+    level: warning
+    required: false
+    extra-allowed: ['{|}']
+    quote-type: any
+
+  # Braces
+  braces:
+    level: error
+    max-spaces-inside: 1
+    min-spaces-inside: 0
+
+  # Brackets
+  brackets:
+    level: error
+    max-spaces-inside: 1
+    min-spaces-inside: 0
+
+  # Commas
+  commas:
+    level: error
+
+  # Colons
+  colons:
+    level: error
+    max-spaces-before: 0
+    max-spaces-after: 1
+
+  # Hyphens
+  hyphens:
+    level: error
+
+  # New lines at end of file
+  new-line-at-end-of-file:
+    level: warning
+
+  # New lines
+  new-lines:
+    type: unix
+
+  # Octal values
+  octal-values:
+    level: error
+
+  # Trailing zeros
+  trailing-zeros:
+    level: warning
+
+  # YAML version
+  yaml-version:
+    - '1.2'
+
+# Ignore specific files or directories
+ignore: |
+  .venv/
+  build/
+  dist/
+  *.egg-info/
+  __pycache__/
+  .pytest_cache/
+  .mypy_cache/
+  alembic/versions/
+  tests/fixtures/

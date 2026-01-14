@@ -1,0 +1,1114 @@
+{% extends 'layout/base.html' %} {% block title %}Push
+Notifications - {{ super() }}{% endblock %} {% block content %}
+<div class="push-notifications-preferences">
+    <div class="page-header">
+        <div class="flexrow f-j-space-between f-a-center">
+            <h1>Push Notifications</h1>
+            <div class="toolbar">
+                <button
+                    type="button"
+                    class="i-button highlight"
+                    id="test-notification-btn"
+                >
+                    <span class="icon-medal"></span>
+                    Test Notification
+                </button>
+            </div>
+        </div>
+        <p class="description">
+            Configure your push notification preferences for
+            Telegram and browser notifications.
+        </p>
+    </div>
+
+    <div class="i-box">
+        <div class="i-box-header">
+            <div class="i-box-title">Telegram Notifications</div>
+        </div>
+        <div class="i-box-content">
+            <div class="telegram-section">
+                {% if user_data.telegram.linked %}
+                <div class="telegram-status linked">
+                    <span
+                        class="icon-checkmark-circle success"
+                    ></span>
+                    <strong>Telegram account linked</strong>
+                    {% if user_data.telegram.username %}
+                    <span class="telegram-username"
+                        >(@{{ user_data.telegram.username
+                        }})</span
+                    >
+                    {% endif %}
+                </div>
+                <div class="action-buttons">
+                    <button
+                        type="button"
+                        class="i-button warning"
+                        id="unlink-telegram-btn"
+                    >
+                        <span class="icon-link-broken"></span>
+                        Unlink Telegram
+                    </button>
+                </div>
+                {% else %}
+                <div class="telegram-status not-linked">
+                    <span class="icon-warning warning"></span>
+                    <strong>Telegram account not linked</strong>
+                    <p class="explanation">
+                        Link your Telegram account to receive
+                        notifications directly in Telegram.
+                    </p>
+                </div>
+                <div class="action-buttons">
+                    <button
+                        type="button"
+                        class="i-button highlight"
+                        id="link-telegram-btn"
+                    >
+                        <span class="icon-link"></span>
+                        Link Telegram Account
+                    </button>
+                </div>
+                {% endif %}
+
+                <div
+                    class="telegram-settings"
+                    style="margin-top: 20px"
+                >
+                    <div class="toggle-setting">
+                        <input
+                            type="checkbox"
+                            id="telegram-enabled"
+                            name="telegram_enabled"
+                            {%
+                            if
+                            user_data.telegram.enabled
+                            %}checked{%
+                            endif
+                            %}
+                            {%
+                            if
+                            not
+                            user_data.telegram.linked
+                            %}disabled{%
+                            endif
+                            %}
+                        />
+                        <label for="telegram-enabled">
+                            <span class="toggle-label"
+                                >Enable Telegram
+                                notifications</span
+                            >
+                            <span class="toggle-description">
+                                Receive notifications in your
+                                Telegram account
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="i-box">
+        <div class="i-box-header">
+            <div class="i-box-title">Web Push Notifications</div>
+        </div>
+        <div class="i-box-content">
+            <div class="webpush-section">
+                <div class="webpush-status">
+                    {% if user_data.push.subscriptions_count > 0
+                    %}
+                    <div class="status-info">
+                        <span
+                            class="icon-checkmark-circle success"
+                        ></span>
+                        <strong
+                            >Push notifications enabled</strong
+                        >
+                        <span class="subscription-count">
+                            ({{
+                            user_data.push.subscriptions_count }}
+                            device{{ 's' if
+                            user_data.push.subscriptions_count >
+                            1 else '' }})
+                        </span>
+                    </div>
+                    <div class="action-buttons">
+                        <button
+                            type="button"
+                            class="i-button warning"
+                            id="unsubscribe-push-btn"
+                        >
+                            <span class="icon-cross"></span>
+                            Unsubscribe All Devices
+                        </button>
+                    </div>
+                    {% else %}
+                    <div class="status-info">
+                        <span
+                            class="icon-warning warning"
+                        ></span>
+                        <strong
+                            >Push notifications not
+                            enabled</strong
+                        >
+                        <p class="explanation">
+                            Enable browser push notifications to
+                            receive native notifications.
+                        </p>
+                    </div>
+                    <div class="action-buttons">
+                        <button
+                            type="button"
+                            class="i-button highlight"
+                            id="subscribe-push-btn"
+                        >
+                            <span class="icon-bell"></span>
+                            Enable Push Notifications
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div
+                    class="webpush-settings"
+                    style="margin-top: 20px"
+                >
+                    <div class="toggle-setting">
+                        <input
+                            type="checkbox"
+                            id="push-enabled"
+                            name="push_enabled"
+                            {%
+                            if
+                            user_data.push.enabled
+                            %}checked{%
+                            endif
+                            %}
+                            {%
+                            if
+                            user_data.push.subscriptions_count=""
+                            ="0"
+                            %}disabled{%
+                            endif
+                            %}
+                        />
+                        <label for="push-enabled">
+                            <span class="toggle-label"
+                                >Enable Web Push
+                                notifications</span
+                            >
+                            <span class="toggle-description">
+                                Receive browser push
+                                notifications
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                {% if user_data.push.subscriptions_count > 0 %}
+                <div
+                    class="subscriptions-list"
+                    style="margin-top: 20px"
+                >
+                    <h4>Registered Devices</h4>
+                    <div id="subscriptions-container">
+                        <!-- Will be populated by JavaScript -->
+                        <div class="no-data">
+                            Loading devices...
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="i-box">
+        <div class="i-box-header">
+            <div class="i-box-title">
+                Notification Preferences
+            </div>
+            <div class="i-box-description">
+                Choose which types of notifications you want to
+                receive
+            </div>
+        </div>
+        <div class="i-box-content">
+            <div class="preferences-grid">
+                <div class="preference-item">
+                    <div class="toggle-setting">
+                        <input
+                            type="checkbox"
+                            id="pref-event-creation"
+                            name="preferences[event_creation]"
+                            {%
+                            if
+                            user_data.preferences.event_creation
+                            %}checked{%
+                            endif
+                            %}
+                        />
+                        <label for="pref-event-creation">
+                            <span class="toggle-label"
+                                >Event creation</span
+                            >
+                            <span class="toggle-description">
+                                When new events are created
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-item">
+                    <div class="toggle-setting">
+                        <input
+                            type="checkbox"
+                            id="pref-event-update"
+                            name="preferences[event_update]"
+                            {%
+                            if
+                            user_data.preferences.event_update
+                            %}checked{%
+                            endif
+                            %}
+                        />
+                        <label for="pref-event-update">
+                            <span class="toggle-label"
+                                >Event updates</span
+                            >
+                            <span class="toggle-description">
+                                When events are updated
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-item">
+                    <div class="toggle-setting">
+                        <input
+                            type="checkbox"
+                            id="pref-registration-open"
+                            name="preferences[registration_open]"
+                            {%
+                            if
+                            user_data.preferences.registration_open
+                            %}checked{%
+                            endif
+                            %}
+                        />
+                        <label for="pref-registration-open">
+                            <span class="toggle-label"
+                                >Registration opens</span
+                            >
+                            <span class="toggle-description">
+                                When registration opens for
+                                events
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-item">
+                    <div class="toggle-setting">
+                        <input
+                            type="checkbox"
+                            id="pref-registration-confirmation"
+                            name="preferences[registration_confirmation]"
+                            {%
+                            if
+                            user_data.preferences.registration_confirmation
+                            %}checked{%
+                            endif
+                            %}
+                        />
+                        <label
+                            for="pref-registration-confirmation"
+                        >
+                            <span class="toggle-label"
+                                >Registration confirmations</span
+                            >
+                            <span class="toggle-description">
+                                When registrations are confirmed
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-item">
+                    <div class="toggle-setting">
+                        <input
+                            type="checkbox"
+                            id="pref-abstract-submission"
+                            name="preferences[abstract_submission]"
+                            {%
+                            if
+                            user_data.preferences.abstract_submission
+                            %}checked{%
+                            endif
+                            %}
+                        />
+                        <label for="pref-abstract-submission">
+                            <span class="toggle-label"
+                                >Abstract submissions</span
+                            >
+                            <span class="toggle-description">
+                                When abstracts are submitted
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-item">
+                    <div class="toggle-setting">
+                        <input
+                            type="checkbox"
+                            id="pref-abstract-review"
+                            name="preferences[abstract_review]"
+                            {%
+                            if
+                            user_data.preferences.abstract_review
+                            %}checked{%
+                            endif
+                            %}
+                        />
+                        <label for="pref-abstract-review">
+                            <span class="toggle-label"
+                                >Abstract reviews</span
+                            >
+                            <span class="toggle-description">
+                                When abstracts are reviewed
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-item">
+                    <div class="toggle-setting">
+                        <input
+                            type="checkbox"
+                            id="pref-reminder"
+                            name="preferences[reminder]"
+                            {%
+                            if
+                            user_data.preferences.reminder
+                            %}checked{%
+                            endif
+                            %}
+                        />
+                        <label for="pref-reminder">
+                            <span class="toggle-label"
+                                >Reminders</span
+                            >
+                            <span class="toggle-description">
+                                Notifications for event reminders
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group" style="margin-top: 30px">
+        <button
+            type="button"
+            class="i-button big highlight"
+            id="save-preferences-btn"
+        >
+            <span class="icon-checkmark"></span>
+            Save Preferences
+        </button>
+        <button
+            type="button"
+            class="i-button big"
+            id="reset-preferences-btn"
+        >
+            <span class="icon-reset"></span>
+            Reset to Defaults
+        </button>
+    </div>
+</div>
+
+<!-- Telegram linking modal -->
+<div
+    id="telegram-linking-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">
+                    Link Telegram Account
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="telegram-linking-instructions">
+                    <p>To link your Telegram account:</p>
+                    <ol>
+                        <li>
+                            Click the link below to open Telegram
+                        </li>
+                        <li>
+                            Start the conversation with the bot
+                        </li>
+                        <li>Click "Start" in the bot chat</li>
+                        <li>Wait for confirmation</li>
+                    </ol>
+
+                    <div
+                        class="telegram-link-container"
+                        style="margin: 20px 0"
+                    >
+                        <a
+                            href="#"
+                            id="telegram-direct-link"
+                            target="_blank"
+                            class="i-button highlight big"
+                            style="
+                                width: 100%;
+                                text-align: center;
+                            "
+                        >
+                            <span class="icon-telegram"></span>
+                            Open Telegram to Link Account
+                        </a>
+                    </div>
+
+                    <div
+                        class="qr-code-container"
+                        style="
+                            text-align: center;
+                            margin: 20px 0;
+                        "
+                    >
+                        <div id="telegram-qr-code"></div>
+                        <p class="small-text">
+                            Scan QR code with Telegram
+                        </p>
+                    </div>
+
+                    <div
+                        class="status-message"
+                        id="linking-status"
+                        style="display: none"
+                    >
+                        <div class="message-content"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="i-button"
+                    data-dismiss="modal"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="button"
+                    class="i-button highlight"
+                    id="check-linking-status-btn"
+                >
+                    <span class="icon-sync"></span>
+                    Check Status
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Test notification modal -->
+<div
+    id="test-notification-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">
+                    Send Test Notification
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="test-message">Message:</label>
+                    <input
+                        type="text"
+                        id="test-message"
+                        class="form-control"
+                        value="Test notification from Indico"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label>Channels:</label>
+                    <div class="channel-options">
+                        <label class="checkbox">
+                            <input
+                                type="checkbox"
+                                name="test-channels"
+                                value="telegram"
+                                checked
+                            />
+                            Telegram
+                        </label>
+                        <label class="checkbox">
+                            <input
+                                type="checkbox"
+                                name="test-channels"
+                                value="push"
+                                checked
+                            />
+                            Web Push
+                        </label>
+                    </div>
+                </div>
+
+                <div
+                    class="status-message"
+                    id="test-status"
+                    style="display: none"
+                >
+                    <div class="message-content"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="i-button"
+                    data-dismiss="modal"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="button"
+                    class="i-button highlight"
+                    id="send-test-btn"
+                >
+                    <span class="icon-send"></span>
+                    Send Test
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} {% block tail %} {{ super() }}
+<script>
+    // Configuration
+    const CONFIG = {
+        userId: {{ user.id }},
+        apiBaseUrl: '{{ url_for("indico_push_notifications_user.user_preferences", user_id=user.id) }}',
+        telegramLinkUrl: '{{ url_for("indico_push_notifications_user.telegram_link", user_id=user.id) }}',
+        telegramUnlinkUrl: '{{ url_for("indico_push_notifications_user.telegram_unlink", user_id=user.id) }}',
+        telegramVerifyUrl: '{{ url_for("indico_push_notifications_user.telegram_verify", user_id=user.id) }}',
+        pushSubscribeUrl: '{{ url_for("indico_push_notifications_user.push_subscribe", user_id=user.id) }}',
+        pushUnsubscribeUrl: '{{ url_for("indico_push_notifications_user.push_unsubscribe", user_id=user.id) }}',
+        pushSubscriptionsUrl: '{{ url_for("indico_push_notifications_user.push_subscriptions", user_id=user.id) }}',
+        testNotificationUrl: '{{ url_for("indico_push_notifications_user.test_notification", user_id=user.id) }}',
+        testPushNotificationUrl: '{{ url_for("indico_push_notifications_user.test_push_notification", user_id=user.id) }}',
+        vapidPublicKey: '{{ plugin.settings.get("vapid_public_key") }}'
+    };
+
+    // User data
+    const USER_DATA = {{ user_data|tojson|safe }};
+
+    // Web Push service worker registration
+    let serviceWorkerRegistration = null;
+    let pushSubscription = null;
+
+    // Initialize when document is ready
+    $(document).ready(function() {
+        initializeEventHandlers();
+        initializeWebPush();
+        loadPushSubscriptions();
+    });
+
+    function initializeEventHandlers() {
+        // Save preferences button
+        $('#save-preferences-btn').click(savePreferences);
+
+        // Reset preferences button
+        $('#reset-preferences-btn').click(resetPreferences);
+
+        // Telegram buttons
+        $('#link-telegram-btn').click(showTelegramLinkingModal);
+        $('#unlink-telegram-btn').click(unlinkTelegram);
+
+        // Web Push buttons
+        $('#subscribe-push-btn').click(subscribeToPush);
+        $('#unsubscribe-push-btn').click(unsubscribeFromPush);
+
+        // Test notification button
+        $('#test-notification-btn').click(showTestNotificationModal);
+
+        // Modal buttons
+        $('#check-linking-status-btn').click(checkLinkingStatus);
+        $('#send-test-btn').click(sendTestNotification);
+
+        // Toggle change handlers
+        $('input[type="checkbox"]').change(function() {
+            updateSaveButtonState();
+        });
+
+        // Device removal buttons (delegated event handler)
+        $('#subscriptions-container').on('click', '.unsubscribe-device-btn', function() {
+            const endpoint = $(this).data('endpoint');
+            removeDevice(endpoint);
+        });
+    }
+
+    function initializeWebPush() {
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            navigator.serviceWorker.register('{{ url_for("static", filename="service-worker.js") }}')
+                .then(function(registration) {
+                    serviceWorkerRegistration = registration;
+                    console.log('Service Worker registered');
+
+                    // Check existing subscription
+                    return registration.pushManager.getSubscription();
+                })
+                .then(function(subscription) {
+                    pushSubscription = subscription;
+                    if (subscription) {
+                        console.log('Existing push subscription found');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Service Worker registration failed:', error);
+                });
+        }
+    }
+
+    function loadPushSubscriptions() {
+        if (USER_DATA.push.subscriptions_count === 0) {
+            return;
+        }
+
+        $.ajax({
+            url: CONFIG.pushSubscriptionsUrl,
+            method: 'GET',
+            success: function(response) {
+                displaySubscriptions(response.subscriptions);
+            },
+            error: function(error) {
+                console.error('Failed to load subscriptions:', error);
+                $('#subscriptions-container').html('<div class="no-data">Failed to load devices</div>');
+            }
+        });
+    }
+
+    function displaySubscriptions(subscriptions) {
+        const container = $('#subscriptions-container');
+
+        if (!subscriptions || subscriptions.length === 0) {
+            container.html('<div class="no-data">No devices registered</div>');
+            return;
+        }
+
+        let html = '<div class="subscriptions-table">';
+        html += '<table class="i-table">';
+        html += '<thead><tr><th>Browser</th><th>Platform</th><th>Registered</th><th>Actions</th></tr></thead>';
+        html += '<tbody></tbody>';
+
+        subscriptions.forEach(function(sub) {
+            const browser = sub.browser || 'Unknown';
+            const platform = sub.platform || 'Unknown';
+            const registered = sub.created ? new Date(sub.created).toLocaleDateString() : 'Unknown';
+
+            html += '<tr>';
+            html += `<td>${browser}</td>`;
+            html += `<td>${platform}</td>`;
+            html += `<td>${registered}</td>`;
+            html += `<td><button class="i-button small warning unsubscribe-device-btn" data-endpoint="${sub.endpoint}">Remove</button></td>`;
+            html += '</tr>';
+        });
+
+        html += '</tbody></table></div>';
+        container.html(html);
+    }
+
+    // Save user preferences
+    function savePreferences() {
+        const data = {
+            telegram_enabled: $('#telegram-enabled').is(':checked'),
+            push_enabled: $('#push-enabled').is(':checked'),
+            preferences: {
+                event_creation: $('#pref-event-creation').is(':checked'),
+                event_update: $('#pref-event-update').is(':checked'),
+                registration_open: $('#pref-registration-open').is(':checked'),
+                registration_confirmation: $('#pref-registration-confirmation').is(':checked'),
+                abstract_submission: $('#pref-abstract-submission').is(':checked'),
+                abstract_review: $('#pref-abstract-review').is(':checked'),
+                reminder: $('#pref-reminder').is(':checked')
+            }
+        };
+
+        $.ajax({
+            url: CONFIG.apiBaseUrl,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                showMessage('success', 'Preferences saved successfully');
+                updateSaveButtonState(false);
+            },
+            error: function(error) {
+                showMessage('error', 'Failed to save preferences: ' + (error.responseJSON?.message || error.statusText));
+            }
+        });
+    }
+
+    // Reset preferences to defaults
+    function resetPreferences() {
+        if (!confirm('Are you sure you want to reset all preferences to default values?')) {
+            return;
+        }
+
+        $.ajax({
+            url: CONFIG.apiBaseUrl,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ reset: true }),
+            success: function(response) {
+                location.reload();
+            },
+            error: function(error) {
+                showMessage('error', 'Failed to reset preferences: ' + (error.responseJSON?.message || error.statusText));
+            }
+        });
+    }
+
+    // Show Telegram linking modal
+    function showTelegramLinkingModal() {
+        $.ajax({
+            url: CONFIG.telegramLinkUrl,
+            method: 'GET',
+            success: function(response) {
+                if (response.success && response.link) {
+                    $('#telegram-direct-link').attr('href', response.link);
+                    $('#telegram-linking-modal').modal('show');
+                    startLinkingStatusCheck();
+                } else {
+                    showMessage('error', 'Failed to generate Telegram link');
+                }
+            },
+            error: function(error) {
+                showMessage('error', 'Failed to generate Telegram link: ' + error.statusText);
+            }
+        });
+    }
+
+    // Unlink Telegram account
+    function unlinkTelegram() {
+        if (!confirm('Are you sure you want to unlink your Telegram account?')) {
+            return;
+        }
+
+        $.ajax({
+            url: CONFIG.telegramUnlinkUrl,
+            method: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    showMessage('success', 'Telegram account unlinked successfully');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showMessage('error', 'Failed to unlink Telegram account');
+                }
+            },
+            error: function(error) {
+                showMessage('error', 'Failed to unlink Telegram account: ' + error.statusText);
+            }
+        });
+    }
+
+    // Subscribe to Web Push notifications
+    function subscribeToPush() {
+        if (!serviceWorkerRegistration) {
+            showMessage('error', 'Service Worker not registered. Please try again.');
+            return;
+        }
+
+        // Request notification permission
+        Notification.requestPermission().then(function(permission) {
+            if (permission !== 'granted') {
+                showMessage('error', 'Notification permission denied');
+                return;
+            }
+
+            // Subscribe to push
+            const applicationServerKey = urlBase64ToUint8Array(CONFIG.vapidPublicKey);
+            serviceWorkerRegistration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: applicationServerKey
+            }).then(function(subscription) {
+                // Send subscription to server
+                return $.ajax({
+                    url: CONFIG.pushSubscribeUrl,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        subscription: subscriptionToObject(subscription)
+                    })
+                });
+            }).then(function(response) {
+                if (response.success) {
+                    showMessage('success', 'Push notifications enabled successfully');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showMessage('error', 'Failed to save subscription');
+                }
+            }).catch(function(error) {
+                console.error('Push subscription failed:', error);
+                showMessage('error', 'Failed to enable push notifications: ' + error.message);
+            });
+        });
+    }
+
+    // Unsubscribe from Web Push notifications
+    function unsubscribeFromPush() {
+        if (!confirm('Are you sure you want to unsubscribe from all push notifications?')) {
+            return;
+        }
+
+        $.ajax({
+            url: CONFIG.pushUnsubscribeUrl,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ endpoint: 'all' }),
+            success: function(response) {
+                if (response.success) {
+                    showMessage('success', 'Unsubscribed from all push notifications');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showMessage('error', 'Failed to unsubscribe');
+                }
+            },
+            error: function(error) {
+                showMessage('error', 'Failed to unsubscribe: ' + error.statusText);
+            }
+        });
+    }
+
+    // Show test notification modal
+    function showTestNotificationModal() {
+        $('#test-notification-modal').modal('show');
+    }
+
+    // Check Telegram linking status
+    function checkLinkingStatus() {
+        $.ajax({
+            url: CONFIG.telegramVerifyUrl,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ check: true }),
+            success: function(response) {
+                if (response.success) {
+                    showMessage('success', 'Telegram account linked successfully!');
+                    setTimeout(() => {
+                        $('#telegram-linking-modal').modal('hide');
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showMessage('info', 'Still waiting for Telegram linking...');
+                }
+            },
+            error: function(error) {
+                showMessage('error', 'Failed to check linking status: ' + error.statusText);
+            }
+        });
+    }
+
+    // Send test notification
+    function sendTestNotification() {
+        const message = $('#test-message').val();
+        const channels = [];
+
+        $('input[name="test-channels"]:checked').each(function() {
+            channels.push($(this).val());
+        });
+
+        if (channels.length === 0) {
+            showMessage('error', 'Please select at least one channel');
+            return;
+        }
+
+        const data = {
+            message: message,
+            channel: channels.join(',')
+        };
+
+        $.ajax({
+            url: CONFIG.testNotificationUrl,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                if (response.success) {
+                    showMessage('success', 'Test notification sent successfully');
+                    $('#test-notification-modal').modal('hide');
+                } else {
+                    showMessage('error', 'Failed to send test notification: ' + (response.message || 'Unknown error'));
+                }
+            },
+            error: function(error) {
+                showMessage('error', 'Failed to send test notification: ' + error.statusText);
+            }
+        });
+    }
+
+    // Remove specific device
+    function removeDevice(endpoint) {
+        if (!confirm('Are you sure you want to remove this device?')) {
+            return;
+        }
+
+        $.ajax({
+            url: CONFIG.pushUnsubscribeUrl,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ endpoint: endpoint }),
+            success: function(response) {
+                if (response.success) {
+                    showMessage('success', 'Device removed successfully');
+                    loadPushSubscriptions();
+                } else {
+                    showMessage('error', 'Failed to remove device');
+                }
+            },
+            error: function(error) {
+                showMessage('error', 'Failed to remove device: ' + error.statusText);
+            }
+        });
+    }
+
+    // Update save button state
+    function updateSaveButtonState(hasChanges = true) {
+        const saveBtn = $('#save-preferences-btn');
+        if (hasChanges) {
+            saveBtn.removeClass('disabled').prop('disabled', false);
+        } else {
+            saveBtn.addClass('disabled').prop('disabled', true);
+        }
+    }
+
+    // Start checking Telegram linking status
+    function startLinkingStatusCheck() {
+        let checkCount = 0;
+        const maxChecks = 30; // 30 checks * 2 seconds = 1 minute
+
+        const checkInterval = setInterval(function() {
+            checkCount++;
+            if (checkCount >= maxChecks) {
+                clearInterval(checkInterval);
+                showMessage('error', 'Linking timeout. Please try again.');
+                return;
+            }
+
+            $.ajax({
+                url: CONFIG.telegramVerifyUrl,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ check: true }),
+                success: function(response) {
+                    if (response.success) {
+                        clearInterval(checkInterval);
+                        showMessage('success', 'Telegram account linked successfully!');
+                        setTimeout(() => {
+                            $('#telegram-linking-modal').modal('hide');
+                            location.reload();
+                        }, 1500);
+                    }
+                }
+            });
+        }, 2000); // Check every 2 seconds
+    }
+
+    // Show message to user
+    function showMessage(type, text) {
+        // Remove any existing messages
+        $('.user-message').remove();
+
+        const messageClass = type === 'success' ? 'success' : type === 'error' ? 'error' : 'warning';
+        const messageHtml = `
+            <div class="user-message ${messageClass}" style="
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${type === 'success' ? '#d4edda' : type === 'error' ? '#f8d7da' : '#fff3cd'};
+                border: 1px solid ${type === 'success' ? '#c3e6cb' : type === 'error' ? '#f5c6cb' : '#ffeaa7'};
+                border-radius: 4px;
+                color: ${type === 'success' ? '#155724' : type === 'error' ? '#721c24' : '#856404'};
+                z-index: 9999;
+                max-width: 400px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            ">
+                ${text}
+            </div>
+        `;
+
+        $('body').append(messageHtml);
+
+        // Auto-remove after 5 seconds
+        setTimeout(function() {
+            $('.user-message').fadeOut(300, function() {
+                $(this).remove();
+            });
+        }, 5000);
+    }
+
+    // Convert subscription to object
+    function subscriptionToObject(subscription) {
+        const key = subscription.getKey ? subscription.getKey('p256dh') : null;
+        const auth = subscription.getKey ? subscription.getKey('auth') : null;
+
+        return {
+            endpoint: subscription.endpoint,
+            keys: {
+                p256dh: key ? btoa(String.fromCharCode.apply(null, new Uint8Array(key))) : null,
+                auth: auth ? btoa(String.fromCharCode.apply(null, new Uint8Array(auth))) : null
+            }
+        };
+    }
+
+    // Convert base64 string to Uint8Array
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding)
+            .replace(/\-/g, '+')
+            .replace(/_/g, '/');
+
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+
+        return outputArray;
+    }
+</script>
+{% endblock %}

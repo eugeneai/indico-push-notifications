@@ -1,0 +1,17 @@
+# Requirements for Indico Push Notifications Plugin
+
+# Core dependencies
+python-telegram-bot>=20.0
+pywebpush>=1.14.0
+cryptography>=41.0.0
+requests>=2.31.0
+
+# Development dependencies (optional)
+pytest>=7.0.0
+pytest-cov>=4.0.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.0.0
+
+# Note: Indico itself is not listed here as it will be installed
+# separately in the Indico environment
